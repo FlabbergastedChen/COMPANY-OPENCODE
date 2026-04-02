@@ -1,0 +1,8 @@
+{
+  // Company OpenCode bundle runtime config
+  "instructions": [
+    "./instructions/constitution.md",
+    "./instructions/coding-standards.md",
+    "./instructions/testing-policy.md"
+  ]
+}
