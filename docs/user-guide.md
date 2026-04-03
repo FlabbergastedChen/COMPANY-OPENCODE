@@ -47,7 +47,7 @@ powershell -ExecutionPolicy Bypass -File .\install\install-company-opencode.ps1
 - Windows 安装脚本会把 `OPENCODE_CONFIG_DIR` 写入用户环境变量。
 - 若本机 `npm -g` 有权限限制，脚本会自动改用用户目录前缀安装（`%USERPROFILE%\.company-opencode\npm-global`），避免管理员权限报错。
 
-Linux / macOS 安装完成后会生成：
+Linux / macOS 与 Windows 安装完成后都会生成：
 - 运行包装命令：`opencode-company`
 - 更新命令：`opencode-company-upgrade`
 - 回滚命令：`opencode-company-rollback`

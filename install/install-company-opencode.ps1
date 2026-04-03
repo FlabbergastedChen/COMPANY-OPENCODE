@@ -10,6 +10,8 @@ $BundlesDir = Join-Path $InstallRoot 'bundles'
 $CurrentLink = Join-Path $InstallRoot 'current'
 $NpmPrefix = Join-Path $InstallRoot 'npm-global'
 $GlobalConfigDir = if ($env:OPENCODE_GLOBAL_CONFIG_DIR) { $env:OPENCODE_GLOBAL_CONFIG_DIR } else { Join-Path $HomeDir '.config/opencode' }
+$InstallScriptsDir = Join-Path $InstallRoot 'install'
+$InstallBinDir = Join-Path $InstallRoot 'bin'
 
 function Write-Info($msg) { Write-Host "[install] $msg" }
 function Write-WarnMsg($msg) { Write-Host "[install][warn] $msg" -ForegroundColor Yellow }
@@ -87,7 +89,7 @@ function Copy-BundleFromPackage {
     } catch {
       # ignore
     }
-    Remove-Item -Path $CurrentLink -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path $CurrentLink -Recurse -Force -ErrorAction SilentlyContinue
   }
 
   # SymbolicLink may require elevated privileges on Windows.
@@ -143,6 +145,76 @@ function Ensure-GlobalCompatLinks {
   Write-Info "Global compatibility paths ensured under: $GlobalConfigDir"
 }
 
+function Install-HelpersAndWrappers {
+  New-Item -ItemType Directory -Force -Path $InstallScriptsDir | Out-Null
+  New-Item -ItemType Directory -Force -Path $InstallBinDir | Out-Null
+
+  $scriptFiles = @(
+    'install-company-opencode.ps1',
+    'upgrade-company-opencode.ps1',
+    'rollback-company-opencode.ps1',
+    'uninstall-company-opencode.ps1'
+  )
+
+  foreach ($name in $scriptFiles) {
+    $src = Join-Path $ScriptDir $name
+    if (Test-Path $src) {
+      Copy-Item -Path $src -Destination (Join-Path $InstallScriptsDir $name) -Force
+    }
+  }
+
+  $wrapper = @"
+@echo off
+setlocal
+if defined COMPANY_OPENCODE_HOME (
+  set "ROOT=%COMPANY_OPENCODE_HOME%"
+) else (
+  set "ROOT=%USERPROFILE%\.company-opencode"
+)
+set "OPENCODE_CONFIG_DIR=%ROOT%\current"
+opencode %*
+"@
+  Set-Content -Path (Join-Path $InstallBinDir 'opencode-company.cmd') -Value $wrapper -Encoding Ascii
+
+  $upgradeWrapper = @"
+@echo off
+setlocal
+if defined COMPANY_OPENCODE_HOME (
+  set "ROOT=%COMPANY_OPENCODE_HOME%"
+) else (
+  set "ROOT=%USERPROFILE%\.company-opencode"
+)
+powershell -ExecutionPolicy Bypass -File "%ROOT%\install\upgrade-company-opencode.ps1" %*
+"@
+  Set-Content -Path (Join-Path $InstallBinDir 'opencode-company-upgrade.cmd') -Value $upgradeWrapper -Encoding Ascii
+
+  $rollbackWrapper = @"
+@echo off
+setlocal
+if defined COMPANY_OPENCODE_HOME (
+  set "ROOT=%COMPANY_OPENCODE_HOME%"
+) else (
+  set "ROOT=%USERPROFILE%\.company-opencode"
+)
+powershell -ExecutionPolicy Bypass -File "%ROOT%\install\rollback-company-opencode.ps1" %*
+"@
+  Set-Content -Path (Join-Path $InstallBinDir 'opencode-company-rollback.cmd') -Value $rollbackWrapper -Encoding Ascii
+
+  $uninstallWrapper = @"
+@echo off
+setlocal
+if defined COMPANY_OPENCODE_HOME (
+  set "ROOT=%COMPANY_OPENCODE_HOME%"
+) else (
+  set "ROOT=%USERPROFILE%\.company-opencode"
+)
+powershell -ExecutionPolicy Bypass -File "%ROOT%\install\uninstall-company-opencode.ps1" %*
+"@
+  Set-Content -Path (Join-Path $InstallBinDir 'opencode-company-uninstall.cmd') -Value $uninstallWrapper -Encoding Ascii
+
+  Write-Info "Installed wrappers into: $InstallBinDir"
+}
+
 function Set-PersistentEnv {
   $configDir = Join-Path $InstallRoot 'current'
   [Environment]::SetEnvironmentVariable('OPENCODE_CONFIG_DIR', $configDir, 'User')
@@ -157,8 +229,20 @@ function Set-PersistentEnv {
   } else {
     Write-Info 'User PATH already contains npm user prefix'
   }
+  $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+  $parts = $userPath -split ';' | Where-Object { $_ -ne '' }
+  if (-not ($parts | Where-Object { $_ -eq $InstallBinDir })) {
+    $newPath = if ($userPath) { "$InstallBinDir;$userPath" } else { $InstallBinDir }
+    [Environment]::SetEnvironmentVariable('Path', $newPath, 'User')
+    Write-Info "Persisted User Env: PATH += $InstallBinDir"
+  } else {
+    Write-Info 'User PATH already contains wrapper bin'
+  }
   if (-not ($env:Path -split ';' | Where-Object { $_ -eq $NpmPrefix })) {
     $env:Path = "$NpmPrefix;$env:Path"
+  }
+  if (-not ($env:Path -split ';' | Where-Object { $_ -eq $InstallBinDir })) {
+    $env:Path = "$InstallBinDir;$env:Path"
   }
   Write-Info 'Persisted User Env: OPENCODE_CONFIG_DIR'
 }
@@ -166,7 +250,9 @@ function Set-PersistentEnv {
 Ensure-OpenCode
 Copy-BundleFromPackage
 Ensure-GlobalCompatLinks
+Install-HelpersAndWrappers
 Set-PersistentEnv
 
 Write-Info 'Done.'
-Write-Info 'Use: opencode --version'
+Write-Info 'Use: opencode-company --version'
+Write-Info 'Use: opencode-company'

@@ -4,6 +4,7 @@ $HomeDir = [Environment]::GetFolderPath('UserProfile')
 $InstallRoot = if ($env:COMPANY_OPENCODE_HOME) { $env:COMPANY_OPENCODE_HOME } else { Join-Path $HomeDir '.company-opencode' }
 $NpmPrefix = Join-Path $InstallRoot 'npm-global'
 $GlobalConfigDir = if ($env:OPENCODE_GLOBAL_CONFIG_DIR) { $env:OPENCODE_GLOBAL_CONFIG_DIR } else { Join-Path $HomeDir '.config/opencode' }
+$InstallBinDir = Join-Path $InstallRoot 'bin'
 
 function Write-Info($msg) { Write-Host "[uninstall] $msg" }
 
@@ -66,6 +67,7 @@ function Clear-Env {
   $env:OPENCODE_CONFIG_DIR = $null
   Write-Info 'Cleared User Env: OPENCODE_CONFIG_DIR'
   Remove-PathEntryFromUserPath $NpmPrefix
+  Remove-PathEntryFromUserPath $InstallBinDir
 }
 
 Clear-NpmPrefixIfManaged
