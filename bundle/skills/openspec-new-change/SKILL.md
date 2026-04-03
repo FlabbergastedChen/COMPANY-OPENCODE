@@ -1,6 +1,6 @@
 ---
 name: openspec-new-change
-description: Start a new OpenSpec change using the experimental artifact workflow. Use when the user wants to create a new feature, fix, or modification with a structured step-by-step approach.
+description: 创建新 change 并展示首个制品指引，不自动创建全部制品。
 license: MIT
 compatibility: Requires openspec CLI.
 metadata:
@@ -9,66 +9,30 @@ metadata:
   generatedBy: "1.2.0"
 ---
 
-Start a new change using the experimental artifact-driven approach.
+用于创建新的 OpenSpec change，并停在“首个制品模板”阶段。
 
-**Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
+## 步骤
+1. 获取或推导 kebab-case 变更名。
+2. 按需确定 schema（默认不传 `--schema`）。
+3. 执行 `opsx-official-cli-artifact-workflow`（new change）。
+4. 执行 `opsx-official-cli-artifact-workflow`（status） 查看制品状态。
+5. 获取首个 ready artifact 的 instructions。
+6. 停止并等待用户下一步指令。
 
-**Steps**
+## 输出
+- change 目录
+- schema 与 artifact 序列
+- 首个 artifact 模板
 
-1. **If no clear input provided, ask what they want to build**
+## 护栏
+- 不创建制品内容
+- 不越过首个模板展示阶段
 
-   Use the **AskUserQuestion tool** (open-ended, no preset options) to ask:
-   > "What change do you want to work on? Describe what you want to build or fix."
+## 工具映射（基于 OpenSpec specs）
+- 列出/选择 change：`opsx-official-cli-list`
+- 状态/指引/创建变更：`opsx-official-cli-artifact-workflow`
+- 归档：`opsx-official-cli-archive`
+- 规范同步：`opsx-official-specs-sync`
+- 实现验证：`opsx-official-verify`
 
-   From their description, derive a kebab-case name (e.g., "add user authentication" → `add-user-auth`).
-
-   **IMPORTANT**: Do NOT proceed without understanding what the user wants to build.
-
-2. **Determine the workflow schema**
-
-   Use the default schema (omit `--schema`) unless the user explicitly requests a different workflow.
-
-   **Use a different schema only if the user mentions:**
-   - A specific schema name → use `--schema <name>`
-   - "show workflows" or "what workflows" → run `openspec schemas --json` and let them choose
-
-   **Otherwise**: Omit `--schema` to use the default.
-
-3. **Create the change directory**
-   ```bash
-   openspec new change "<name>"
-   ```
-   Add `--schema <name>` only if the user requested a specific workflow.
-   This creates a scaffolded change at `openspec/changes/<name>/` with the selected schema.
-
-4. **Show the artifact status**
-   ```bash
-   openspec status --change "<name>"
-   ```
-   This shows which artifacts need to be created and which are ready (dependencies satisfied).
-
-5. **Get instructions for the first artifact**
-   The first artifact depends on the schema (e.g., `proposal` for spec-driven).
-   Check the status output to find the first artifact with status "ready".
-   ```bash
-   openspec instructions <first-artifact-id> --change "<name>"
-   ```
-   This outputs the template and context for creating the first artifact.
-
-6. **STOP and wait for user direction**
-
-**Output**
-
-After completing the steps, summarize:
-- Change name and location
-- Schema/workflow being used and its artifact sequence
-- Current status (0/N artifacts complete)
-- The template for the first artifact
-- Prompt: "Ready to create the first artifact? Just describe what this change is about and I'll draft it, or ask me to continue."
-
-**Guardrails**
-- Do NOT create any artifacts yet - just show the instructions
-- Do NOT advance beyond showing the first artifact template
-- If the name is invalid (not kebab-case), ask for a valid name
-- If a change with that name already exists, suggest continuing that change instead
-- Pass --schema if using a non-default workflow
+说明：本技能优先使用上述能力映射，不依赖模型直接理解 `openspec ...` 原始命令字符串。
