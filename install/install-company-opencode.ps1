@@ -8,9 +8,11 @@ $HomeDir = [Environment]::GetFolderPath('UserProfile')
 $InstallRoot = if ($env:COMPANY_OPENCODE_HOME) { $env:COMPANY_OPENCODE_HOME } else { Join-Path $HomeDir '.company-opencode' }
 $BundlesDir = Join-Path $InstallRoot 'bundles'
 $CurrentLink = Join-Path $InstallRoot 'current'
+$NpmPrefix = Join-Path $InstallRoot 'npm-global'
 
 function Write-Info($msg) { Write-Host "[install] $msg" }
 function Write-WarnMsg($msg) { Write-Host "[install][warn] $msg" -ForegroundColor Yellow }
+function Write-ErrMsg($msg) { Write-Host "[install][error] $msg" -ForegroundColor Red }
 
 function Get-BundleVersion {
   $manifest = Join-Path $BundleSrc 'bundle-manifest.json'
@@ -27,8 +29,27 @@ function Ensure-OpenCode {
     return
   }
 
-  Write-Info 'opencode not found. Installing via npm install -g opencode-ai'
-  npm install -g opencode-ai
+  $npmCmd = Get-Command npm -ErrorAction SilentlyContinue
+  if (-not $npmCmd) {
+    throw 'npm not found. Please install Node.js first: https://nodejs.org/'
+  }
+
+  # Avoid global permission errors by forcing a per-user npm prefix.
+  New-Item -ItemType Directory -Force -Path $NpmPrefix | Out-Null
+  npm config set prefix "$NpmPrefix" --location=user | Out-Null
+
+  if (-not ($env:Path -split ';' | Where-Object { $_ -eq $NpmPrefix })) {
+    $env:Path = "$NpmPrefix;$env:Path"
+  }
+
+  Write-Info "opencode not found. Installing via npm install -g opencode-ai (user prefix: $NpmPrefix)"
+  try {
+    npm install -g opencode-ai
+  } catch {
+    Write-ErrMsg 'npm global install failed. This is often caused by permission policies.'
+    Write-ErrMsg "Try running PowerShell as your normal user and ensure $NpmPrefix is writable."
+    throw
+  }
 
   $cmd2 = Get-Command opencode -ErrorAction SilentlyContinue
   if (-not $cmd2) {
@@ -68,12 +89,31 @@ function Copy-BundleFromPackage {
     Remove-Item -Path $CurrentLink -Force -ErrorAction SilentlyContinue
   }
 
-  New-Item -ItemType SymbolicLink -Path $CurrentLink -Target $dst | Out-Null
-  Write-Info "Current bundle -> $dst"
+  # SymbolicLink may require elevated privileges on Windows.
+  # Prefer junction first; fall back to a directory copy.
+  try {
+    New-Item -ItemType Junction -Path $CurrentLink -Target $dst | Out-Null
+    Write-Info "Current bundle (junction) -> $dst"
+  } catch {
+    Write-WarnMsg "Cannot create junction at $CurrentLink. Falling back to directory copy."
+    New-Item -ItemType Directory -Force -Path $CurrentLink | Out-Null
+    Copy-Item -Path (Join-Path $dst '*') -Destination $CurrentLink -Recurse -Force
+    Write-Info "Current bundle copied to: $CurrentLink"
+  }
 }
 
 function Set-PersistentEnv {
   [Environment]::SetEnvironmentVariable('OPENCODE_CONFIG_DIR', (Join-Path $InstallRoot 'current'), 'User')
+  $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+  if (-not $userPath) { $userPath = '' }
+  $parts = $userPath -split ';' | Where-Object { $_ -ne '' }
+  if (-not ($parts | Where-Object { $_ -eq $NpmPrefix })) {
+    $newPath = if ($userPath) { "$NpmPrefix;$userPath" } else { $NpmPrefix }
+    [Environment]::SetEnvironmentVariable('Path', $newPath, 'User')
+    Write-Info "Persisted User Env: PATH += $NpmPrefix"
+  } else {
+    Write-Info 'User PATH already contains npm user prefix'
+  }
   Write-Info 'Persisted User Env: OPENCODE_CONFIG_DIR'
 }
 

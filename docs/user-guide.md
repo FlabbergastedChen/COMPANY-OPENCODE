@@ -20,10 +20,14 @@ ls bundle install
 应至少看到：
 - `bundle/`
 - `install/install-company-opencode.sh`
+- `install/install-company-opencode.ps1`
 - `install/upgrade-company-opencode.sh`
 - `install/uninstall-company-opencode.sh`
+- `install/uninstall-company-opencode.ps1`
 
 ## 2. 安装
+
+### 2.1 Linux / macOS
 
 注意：必须用 `bash` 执行，不要用 `sh`。
 
@@ -32,7 +36,18 @@ cd /data/cjr/COMPANY-OPENCODE
 bash install/install-company-opencode.sh
 ```
 
-安装完成后会生成：
+### 2.2 Windows（PowerShell）
+
+```powershell
+cd C:\path\to\COMPANY-OPENCODE
+powershell -ExecutionPolicy Bypass -File .\install\install-company-opencode.ps1
+```
+
+说明：
+- Windows 安装脚本会把 `OPENCODE_CONFIG_DIR` 写入用户环境变量。
+- 若本机 `npm -g` 有权限限制，脚本会自动改用用户目录前缀安装（`%USERPROFILE%\.company-opencode\npm-global`），避免管理员权限报错。
+
+Linux / macOS 安装完成后会生成：
 - 运行包装命令：`opencode-company`
 - 更新命令：`opencode-company-upgrade`
 - 回滚命令：`opencode-company-rollback`
@@ -42,12 +57,26 @@ bash install/install-company-opencode.sh
 - `OPENCODE_CONFIG_DIR=~/.company-opencode/current`
 - `PATH` 增加 `~/.local/bin`
 
+Windows 安装完成后会：
+- 写入用户环境变量 `OPENCODE_CONFIG_DIR=%USERPROFILE%\.company-opencode\current`
+- 在用户 `PATH` 中加入 `%USERPROFILE%\.company-opencode\npm-global`（用于 `opencode` 命令）
+
 ## 3. 基础验证
+
+### 3.1 Linux / macOS
 
 ```bash
 opencode-company --version
 readlink -f ~/.company-opencode/current
 sed -n '1,120p' ~/.company-opencode/current/opencode.jsonc
+```
+
+### 3.2 Windows（PowerShell）
+
+```powershell
+opencode --version
+Get-Item "$env:USERPROFILE\.company-opencode\current"
+Get-Content "$env:USERPROFILE\.company-opencode\current\opencode.jsonc" -TotalCount 120
 ```
 
 `opencode.jsonc` 中应包含 `instructions` 配置。
@@ -271,6 +300,47 @@ cat > ~/.config/opencode/opencode.jsonc <<'EOF2'
 EOF2
 ```
 
+### 5.3 全局本地模型配置（按你的当前配置方式）
+
+你的机器当前使用的是全局配置文件：
+
+```text
+~/.config/opencode/opencode.json
+```
+
+可按下面方式修改（OpenAI-compatible 本地网关）：
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "minimax": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Minimax Local",
+      "options": {
+        "baseURL": "http://<你的地址>:<端口>/v1",
+        "apiKey": "<你的密钥>"
+      },
+      "models": {
+        "minimax25": {
+          "name": "Minimax 25"
+        }
+      }
+    }
+  }
+}
+```
+
+修改步骤（PowerShell / bash 都适用）：
+
+1. 编辑文件 `~/.config/opencode/opencode.json`。
+2. 只替换 `options.baseURL`、`options.apiKey`，以及需要的模型别名（如 `models.minimax25`）。
+3. 保存后重开终端，或重启 opencode 会话使配置生效。
+
+注意：
+- `apiKey` 属于敏感信息，不要提交到 Git 仓库。
+- 如果你同时配置了多个 provider，调用时要确保选择了对应模型别名。
+
 ## 6. 更新
 
 ```bash
@@ -287,6 +357,8 @@ opencode-company --version
 
 ## 7. 卸载（不删除你解压的项目目录）
 
+### 7.1 Linux / macOS
+
 ```bash
 cd /data/cjr/COMPANY-OPENCODE
 bash install/uninstall-company-opencode.sh
@@ -298,10 +370,16 @@ bash install/uninstall-company-opencode.sh
 opencode-company-uninstall
 ```
 
+### 7.2 Windows（PowerShell）
+
+```powershell
+cd C:\path\to\COMPANY-OPENCODE
+powershell -ExecutionPolicy Bypass -File .\install\uninstall-company-opencode.ps1
+```
+
 卸载会：
-- 删除 `~/.company-opencode`
-- 删除 `~/.local/bin/opencode-company*` 包装命令
-- 删除 shell rc 中注入的 `company-opencode` 环境变量块
+- Linux / macOS：删除 `~/.company-opencode`、`~/.local/bin/opencode-company*` 包装命令、shell rc 中注入的 `company-opencode` 环境变量块
+- Windows：删除 `%USERPROFILE%\.company-opencode`，并清理用户环境变量中的 `OPENCODE_CONFIG_DIR` 与 `%USERPROFILE%\.company-opencode\npm-global` 路径
 
 不会删除：
 - 你解压出来的项目目录（例如 `/data/cjr/COMPANY-OPENCODE`）
@@ -329,4 +407,19 @@ bash install/install-company-opencode.sh
 
 ```bash
 bash install/upgrade-company-opencode.sh
+```
+
+### 8.3 Windows 安装报 `permission error`
+
+常见原因是 `npm install -g` 需要管理员权限。新版 `install-company-opencode.ps1` 已默认使用用户级 npm prefix 规避此问题。若仍失败，检查：
+
+```powershell
+npm config get prefix --location=user
+Test-Path "$env:USERPROFILE\.company-opencode\npm-global"
+```
+
+然后重新执行安装脚本：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install\install-company-opencode.ps1
 ```
