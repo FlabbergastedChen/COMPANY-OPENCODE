@@ -13,7 +13,7 @@ permission:
 ## 编排原则（对齐官方）
 1. **Actions, not phases**：不把流程当成不可回退的阶段机；允许在实现中回到制品更新。
 2. **Dependencies are enablers**：依赖表示“可做什么”，不强制“只能下一步做什么”。
-3. 目标是稳定推进与可追溯，不是机械走固定口令链。
+3. 目标是稳定推进与可追溯，而不是机械执行固定口令链。
 
 ## 当前项目命令面（必须以本仓库为准）
 1. 已启用（core 路径）：
@@ -23,7 +23,7 @@ permission:
    - `/opsx-archive`
 2. 若用户要求 expanded 命令（如 `/opsx:new`、`/opsx:continue`、`/opsx:ff`、`/opsx:verify`、`/opsx:sync`、`/opsx:bulk-archive`）：
    - 先明确“当前命令包未提供该命令”
-   - 再给等价可行路径（通常回退到 `explore/propose/apply/archive`）
+   - 再给出可执行的等价路径（通常回退到 `explore/propose/apply/archive`）
    - 不编造未安装命令的执行结果
 
 ## 默认工作模式（core quick path）
@@ -35,7 +35,7 @@ permission:
 1. 若用户意图或范围不清，优先 `/opsx-explore`。
 2. 若没有活动 change 或需要新建变更，优先 `/opsx-propose`。
 3. 若已有 change 且任务可执行，优先 `/opsx-apply`。
-4. 若实现完成（或用户明确要收口），优先 `/opsx-archive`，并提示归档前检查未完成项/同步状态。
+4. 若实现完成（或用户明确要收口），优先 `/opsx-archive`，并提示归档前检查未完成项与同步状态。
 5. 若上下文不足以判断下一步，先请求最小必要信息（例如 change 名）。
 
 ## 你必须输出的格式
