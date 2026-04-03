@@ -43,6 +43,15 @@ cd C:\path\to\COMPANY-OPENCODE
 powershell -ExecutionPolicy Bypass -File .\install\install-company-opencode.ps1
 ```
 
+### 2.3 Windows（CMD）
+
+```cmd
+cd /d C:\path\to\COMPANY-OPENCODE
+install\install-company-opencode.cmd
+```
+
+说明：该 CMD 脚本会调用 PowerShell 安装，并在当前 CMD 会话临时注入 PATH，安装后可立即执行 `opencode-company`。
+
 说明：
 - Windows 安装脚本会把 `OPENCODE_CONFIG_DIR` 写入用户环境变量。
 - 若本机 `npm -g` 有权限限制，脚本会自动改用用户目录前缀安装（`%USERPROFILE%\.company-opencode\npm-global`），避免管理员权限报错。
@@ -406,6 +415,13 @@ opencode-company-uninstall
 ```powershell
 cd C:\path\to\COMPANY-OPENCODE
 powershell -ExecutionPolicy Bypass -File .\install\uninstall-company-opencode.ps1
+```
+
+Windows（CMD）也可用：
+
+```cmd
+cd /d C:\path\to\COMPANY-OPENCODE
+install\uninstall-company-opencode.cmd
 ```
 
 卸载会：
