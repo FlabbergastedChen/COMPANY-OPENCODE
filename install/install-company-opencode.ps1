@@ -9,6 +9,7 @@ $InstallRoot = if ($env:COMPANY_OPENCODE_HOME) { $env:COMPANY_OPENCODE_HOME } el
 $BundlesDir = Join-Path $InstallRoot 'bundles'
 $CurrentLink = Join-Path $InstallRoot 'current'
 $NpmPrefix = Join-Path $InstallRoot 'npm-global'
+$GlobalConfigDir = if ($env:OPENCODE_GLOBAL_CONFIG_DIR) { $env:OPENCODE_GLOBAL_CONFIG_DIR } else { Join-Path $HomeDir '.config/opencode' }
 
 function Write-Info($msg) { Write-Host "[install] $msg" }
 function Write-WarnMsg($msg) { Write-Host "[install][warn] $msg" -ForegroundColor Yellow }
@@ -102,8 +103,50 @@ function Copy-BundleFromPackage {
   }
 }
 
+function Ensure-GlobalCompatLinks {
+  New-Item -ItemType Directory -Force -Path $GlobalConfigDir | Out-Null
+  New-Item -ItemType Directory -Force -Path (Join-Path $InstallRoot 'backups') | Out-Null
+
+  $dirs = @('agents', 'commands', 'skills', 'plugins', 'tools', 'themes', 'modes')
+  $ts = Get-Date -Format 'yyyyMMdd-HHmmss'
+
+  foreach ($d in $dirs) {
+    $src = Join-Path $CurrentLink $d
+    if (-not (Test-Path $src)) { continue }
+
+    $dst = Join-Path $GlobalConfigDir $d
+    if (Test-Path $dst) {
+      try {
+        $item = Get-Item $dst -Force
+        if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+          Remove-Item -Path $dst -Force -ErrorAction SilentlyContinue
+        } else {
+          $backup = Join-Path (Join-Path $InstallRoot 'backups') ("compat-$d-$ts")
+          Write-WarnMsg "Found existing non-link at $dst; moving to $backup"
+          Move-Item -Path $dst -Destination $backup -Force
+        }
+      } catch {
+        Remove-Item -Path $dst -Recurse -Force -ErrorAction SilentlyContinue
+      }
+    }
+
+    # Prefer junctions for directory links on Windows.
+    try {
+      New-Item -ItemType Junction -Path $dst -Target $src | Out-Null
+    } catch {
+      Write-WarnMsg "Cannot create junction $dst -> $src. Falling back to directory copy."
+      New-Item -ItemType Directory -Force -Path $dst | Out-Null
+      Copy-Item -Path (Join-Path $src '*') -Destination $dst -Recurse -Force
+    }
+  }
+
+  Write-Info "Global compatibility paths ensured under: $GlobalConfigDir"
+}
+
 function Set-PersistentEnv {
-  [Environment]::SetEnvironmentVariable('OPENCODE_CONFIG_DIR', (Join-Path $InstallRoot 'current'), 'User')
+  $configDir = Join-Path $InstallRoot 'current'
+  [Environment]::SetEnvironmentVariable('OPENCODE_CONFIG_DIR', $configDir, 'User')
+  $env:OPENCODE_CONFIG_DIR = $configDir
   $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
   if (-not $userPath) { $userPath = '' }
   $parts = $userPath -split ';' | Where-Object { $_ -ne '' }
@@ -114,11 +157,15 @@ function Set-PersistentEnv {
   } else {
     Write-Info 'User PATH already contains npm user prefix'
   }
+  if (-not ($env:Path -split ';' | Where-Object { $_ -eq $NpmPrefix })) {
+    $env:Path = "$NpmPrefix;$env:Path"
+  }
   Write-Info 'Persisted User Env: OPENCODE_CONFIG_DIR'
 }
 
 Ensure-OpenCode
 Copy-BundleFromPackage
+Ensure-GlobalCompatLinks
 Set-PersistentEnv
 
 Write-Info 'Done.'

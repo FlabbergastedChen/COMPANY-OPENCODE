@@ -3,6 +3,7 @@ $ErrorActionPreference = 'Stop'
 $HomeDir = [Environment]::GetFolderPath('UserProfile')
 $InstallRoot = if ($env:COMPANY_OPENCODE_HOME) { $env:COMPANY_OPENCODE_HOME } else { Join-Path $HomeDir '.company-opencode' }
 $NpmPrefix = Join-Path $InstallRoot 'npm-global'
+$GlobalConfigDir = if ($env:OPENCODE_GLOBAL_CONFIG_DIR) { $env:OPENCODE_GLOBAL_CONFIG_DIR } else { Join-Path $HomeDir '.config/opencode' }
 
 function Write-Info($msg) { Write-Host "[uninstall] $msg" }
 
@@ -40,13 +41,35 @@ function Remove-InstallRoot {
   }
 }
 
+function Remove-GlobalCompatPaths {
+  $dirs = @('agents', 'commands', 'skills', 'plugins', 'tools', 'themes', 'modes')
+  foreach ($d in $dirs) {
+    $p = Join-Path $GlobalConfigDir $d
+    if (-not (Test-Path $p)) { continue }
+    try {
+      $item = Get-Item $p -Force
+      if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+        $target = $item.Target
+        if ($target -and $target.ToString().StartsWith($InstallRoot)) {
+          Remove-Item -Path $p -Force -ErrorAction SilentlyContinue
+          Write-Info "Removed global compat link: $p"
+        }
+      }
+    } catch {
+      # ignore
+    }
+  }
+}
+
 function Clear-Env {
   [Environment]::SetEnvironmentVariable('OPENCODE_CONFIG_DIR', $null, 'User')
+  $env:OPENCODE_CONFIG_DIR = $null
   Write-Info 'Cleared User Env: OPENCODE_CONFIG_DIR'
   Remove-PathEntryFromUserPath $NpmPrefix
 }
 
 Clear-NpmPrefixIfManaged
+Remove-GlobalCompatPaths
 Clear-Env
 Remove-InstallRoot
 

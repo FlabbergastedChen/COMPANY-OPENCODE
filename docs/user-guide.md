@@ -94,19 +94,50 @@ opencode-company
 - `speckit-orchestrator`
 - `openspec-orchestrator`
 - `superpowers-orchestrator`
-- `superpowers-code-reviewer`（评审子代理）
+- `code-reviewer`（代码评审代理）
 
-### 4.2 主要命令
+### 4.2 内置命令总览（按当前项目）
 
-- Speckit：`/speckit-specify`、`/speckit-plan`、`/speckit-tasks`、`/speckit-implement`
-- OpenSpec：`/openspec-propose`、`/openspec-apply`、`/openspec-verify`
-- Superpowers：`/superpowers-brainstorm`、`/superpowers-write-plan`、`/superpowers-execute-plan`、`/superpowers-request-review`
+- Speckit：`/speckit-specify`、`/speckit-clarify`、`/speckit-plan`、`/speckit-tasks`、`/speckit-implement`、`/speckit-checklist`、`/speckit-analyze`、`/speckit-constitution`、`/speckit-taskstoissues`
+- OPSX：`/opsx-onboard`、`/opsx-explore`、`/opsx-propose`、`/opsx-apply`、`/opsx-verify`、`/opsx-sync`、`/opsx-new`、`/opsx-continue`、`/opsx-ff`、`/opsx-archive`、`/opsx-bulk-archive`
+- Superpowers：`/superpowers-brainstorm`、`/superpowers-write-plan`、`/superpowers-execute-plan`
 
-示例：
+### 4.3 推荐使用流程
+
+1. Speckit（需求到实现）  
+   `/speckit-specify -> /speckit-clarify -> /speckit-plan -> /speckit-tasks -> /speckit-implement`
+2. OPSX（变更编排）  
+   `/opsx-explore -> /opsx-propose -> /opsx-apply -> /opsx-verify -> /opsx-archive`
+3. Superpowers（快速方案与执行）  
+   `/superpowers-brainstorm -> /superpowers-write-plan -> /superpowers-execute-plan`
+
+### 4.4 可复制示例
+
+Speckit 示例：
 
 ```text
-/superpowers-brainstorm 实现一个堆排序
-/superpowers-write-plan 为堆排序生成任务计划
+/speckit-specify 设计一个支持重试和幂等的支付回调模块
+/speckit-clarify
+/speckit-plan
+/speckit-tasks
+/speckit-implement
+```
+
+OPSX 示例：
+
+```text
+/opsx-explore 对现有登录流程做风险扫描并给出改造建议
+/opsx-propose
+/opsx-apply
+/opsx-verify
+/opsx-archive
+```
+
+Superpowers 示例：
+
+```text
+/superpowers-brainstorm 实现一个高可读性的堆排序教学版本
+/superpowers-write-plan 为堆排序生成可执行任务计划
 /superpowers-execute-plan
 ```
 
