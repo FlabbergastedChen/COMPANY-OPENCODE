@@ -1,5 +1,5 @@
 ---
-description: "Deprecated - use the superpowers:writing-plans skill instead"
+description: "已废弃 - 请改用 superpowers:writing-plans skill"
 ---
 
-Tell your human partner that this command is deprecated and will be removed in the next major release. They should ask you to use the "superpowers writing-plans" skill instead.
+告知你的协作对象：该命令已废弃，并将在下一个大版本中移除。请改为让你使用“superpowers writing-plans”技能。
