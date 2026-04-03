@@ -1,6 +1,6 @@
 {
   "name": "opencode-bundle",
-  "version": "2026.04.01",
+  "version": "2026.04.02",
   "commands": [
     "speckit-constitution",
     "speckit-specify",
@@ -67,6 +67,7 @@
   "agents": [
     "speckit-orchestrator",
     "openspec-orchestrator",
+    "superpowers-orchestrator",
     "superpowers-code-reviewer"
   ]
 }

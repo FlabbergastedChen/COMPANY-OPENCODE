@@ -16,6 +16,7 @@ BUNDLES_DIR="$INSTALL_ROOT/bundles"
 CURRENT_LINK="$INSTALL_ROOT/current"
 INSTALL_BIN_DIR="$HOME/.local/bin"
 INSTALL_SCRIPTS_DIR="$INSTALL_ROOT/install"
+GLOBAL_CONFIG_DIR="${OPENCODE_GLOBAL_CONFIG_DIR:-$HOME/.config/opencode}"
 
 log() { printf '[install] %s\n' "$*"; }
 warn() { printf '[install][warn] %s\n' "$*"; }
@@ -97,12 +98,13 @@ sync_bundle_from_package() {
   mkdir -p "$BUNDLES_DIR" "$INSTALL_ROOT/backups" "$INSTALL_ROOT/logs" "$INSTALL_ROOT/cache" "$INSTALL_SCRIPTS_DIR"
 
   if [[ -e "$dst" ]]; then
-    log "Bundle version already exists: $version"
+    log "Bundle version already exists: $version (refreshing files)"
+    rm -rf "$dst"
   else
     log "Copying bundle from package: $BUNDLE_SRC -> $dst"
-    mkdir -p "$dst"
-    cp -R "$BUNDLE_SRC"/. "$dst"/
   fi
+  mkdir -p "$dst"
+  cp -R "$BUNDLE_SRC"/. "$dst"/
 
   if [[ -L "$CURRENT_LINK" || -e "$CURRENT_LINK" ]]; then
     local ts
@@ -116,6 +118,35 @@ sync_bundle_from_package() {
 
   ln -sfn "$dst" "$CURRENT_LINK"
   log "Current bundle -> $dst"
+}
+
+link_global_compat_dirs() {
+  mkdir -p "$GLOBAL_CONFIG_DIR"
+  mkdir -p "$INSTALL_ROOT/backups"
+
+  local dirs=(agents commands skills plugins tools themes modes)
+  local d src dst ts backup
+  ts="$(date +%Y%m%d-%H%M%S)"
+  for d in "${dirs[@]}"; do
+    src="$CURRENT_LINK/$d"
+    dst="$GLOBAL_CONFIG_DIR/$d"
+    [[ -e "$src" ]] || continue
+
+    if [[ -L "$dst" ]]; then
+      ln -sfn "$src" "$dst"
+      continue
+    fi
+
+    if [[ -e "$dst" ]]; then
+      backup="$INSTALL_ROOT/backups/compat-${d}-$ts"
+      warn "Found existing non-symlink at $dst; moving to $backup"
+      mv "$dst" "$backup"
+    fi
+
+    ln -s "$src" "$dst"
+  done
+
+  log "Global compatibility links ensured under $GLOBAL_CONFIG_DIR"
 }
 
 install_wrappers_and_scripts() {
@@ -189,6 +220,7 @@ $end"
 main() {
   install_opencode_if_missing
   sync_bundle_from_package
+  link_global_compat_dirs
   install_wrappers_and_scripts
   ensure_persistent_env
 

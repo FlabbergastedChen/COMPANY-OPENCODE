@@ -9,8 +9,9 @@ description: "根据 tasks 执行实现并持续更新任务进度。"
 执行要求：
 1. 先对齐本命令目标：根据 tasks 执行实现并持续更新任务进度。
 2. 优先按技能 `openspec-apply-change` 的工作方式执行。
-3. 若参数缺失，基于上下文做最小假设并明确写出假设。
-4. 若出现阻塞，输出阻塞原因、影响范围与建议解法，不做无依据猜测。
+3. 若 Skill 工具调用失败，回退读取本地文件：`$OPENCODE_CONFIG_DIR/skills/openspec-apply-change/SKILL.md`，必要时再读 `~/.config/opencode/skills/openspec-apply-change/SKILL.md`。
+4. 若参数缺失，基于上下文做最小假设并明确写出假设。
+5. 若出现阻塞，输出阻塞原因、影响范围与建议解法，不做无依据猜测。
 
 输出要求：
 - 代码改动

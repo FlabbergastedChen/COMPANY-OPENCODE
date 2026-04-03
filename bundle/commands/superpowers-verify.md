@@ -9,8 +9,9 @@ description: "在宣称完成前强制执行验证门禁。"
 执行要求：
 1. 先对齐本命令目标：在宣称完成前强制执行验证门禁。
 2. 优先按技能 `superpowers-verification-before-completion` 的工作方式执行。
-3. 若参数缺失，基于上下文做最小假设并明确写出假设。
-4. 若出现阻塞，输出阻塞原因、影响范围与建议解法，不做无依据猜测。
+3. 若 Skill 工具调用失败，回退读取本地文件：`$OPENCODE_CONFIG_DIR/skills/superpowers-verification-before-completion/SKILL.md`，必要时再读 `~/.config/opencode/skills/superpowers-verification-before-completion/SKILL.md`。
+4. 若参数缺失，基于上下文做最小假设并明确写出假设。
+5. 若出现阻塞，输出阻塞原因、影响范围与建议解法，不做无依据猜测。
 
 输出要求：
 - 验证证据

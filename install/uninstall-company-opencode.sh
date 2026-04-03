@@ -9,6 +9,7 @@ set -euo pipefail
 
 INSTALL_ROOT="${COMPANY_OPENCODE_HOME:-$HOME/.company-opencode}"
 INSTALL_BIN_DIR="$HOME/.local/bin"
+GLOBAL_CONFIG_DIR="${OPENCODE_GLOBAL_CONFIG_DIR:-$HOME/.config/opencode}"
 
 BEGIN_MARKER="# >>> company-opencode >>>"
 END_MARKER="# <<< company-opencode <<<"
@@ -39,6 +40,23 @@ remove_wrapper() {
   fi
 }
 
+remove_global_compat_links() {
+  local dirs=(agents commands skills plugins tools themes modes)
+  local d p t
+  for d in "${dirs[@]}"; do
+    p="$GLOBAL_CONFIG_DIR/$d"
+    if [[ -L "$p" ]]; then
+      t="$(readlink "$p" 2>/dev/null || true)"
+      case "$t" in
+        "$INSTALL_ROOT"/*)
+          rm -f "$p"
+          log "Removed global compat link: $p"
+          ;;
+      esac
+    fi
+  done
+}
+
 main() {
   local rc_files=("$HOME/.zshrc" "$HOME/.zprofile" "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile")
 
@@ -50,6 +68,7 @@ main() {
   remove_wrapper "$INSTALL_BIN_DIR/opencode-company-upgrade"
   remove_wrapper "$INSTALL_BIN_DIR/opencode-company-rollback"
   remove_wrapper "$INSTALL_BIN_DIR/opencode-company-uninstall"
+  remove_global_compat_links
 
   if [[ -e "$INSTALL_ROOT" || -L "$INSTALL_ROOT" ]]; then
     rm -rf "$INSTALL_ROOT"
