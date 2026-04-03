@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+$ConfirmPreference = 'None'
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $PackageRoot = Resolve-Path (Join-Path $ScriptDir '..')
@@ -171,7 +172,14 @@ if defined COMPANY_OPENCODE_HOME (
 ) else (
   set "ROOT=%USERPROFILE%\.company-opencode"
 )
+set "PATH=%ROOT%\npm-global;%PATH%"
 set "OPENCODE_CONFIG_DIR=%ROOT%\current"
+where opencode >nul 2>nul
+if errorlevel 1 (
+  echo [opencode-company][error] opencode not found in PATH.
+  echo [opencode-company][error] Expected path: %ROOT%\npm-global
+  exit /b 1
+)
 opencode %*
 "@
   Set-Content -Path (Join-Path $InstallBinDir 'opencode-company.cmd') -Value $wrapper -Encoding Ascii
@@ -184,7 +192,7 @@ if defined COMPANY_OPENCODE_HOME (
 ) else (
   set "ROOT=%USERPROFILE%\.company-opencode"
 )
-powershell -ExecutionPolicy Bypass -File "%ROOT%\install\upgrade-company-opencode.ps1" %*
+powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%ROOT%\install\upgrade-company-opencode.ps1" %*
 "@
   Set-Content -Path (Join-Path $InstallBinDir 'opencode-company-upgrade.cmd') -Value $upgradeWrapper -Encoding Ascii
 
@@ -196,7 +204,7 @@ if defined COMPANY_OPENCODE_HOME (
 ) else (
   set "ROOT=%USERPROFILE%\.company-opencode"
 )
-powershell -ExecutionPolicy Bypass -File "%ROOT%\install\rollback-company-opencode.ps1" %*
+powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%ROOT%\install\rollback-company-opencode.ps1" %*
 "@
   Set-Content -Path (Join-Path $InstallBinDir 'opencode-company-rollback.cmd') -Value $rollbackWrapper -Encoding Ascii
 
@@ -208,7 +216,7 @@ if defined COMPANY_OPENCODE_HOME (
 ) else (
   set "ROOT=%USERPROFILE%\.company-opencode"
 )
-powershell -ExecutionPolicy Bypass -File "%ROOT%\install\uninstall-company-opencode.ps1" %*
+powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%ROOT%\install\uninstall-company-opencode.ps1" %*
 "@
   Set-Content -Path (Join-Path $InstallBinDir 'opencode-company-uninstall.cmd') -Value $uninstallWrapper -Encoding Ascii
 

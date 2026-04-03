@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+$ConfirmPreference = 'None'
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
@@ -11,4 +12,3 @@ if (-not (Test-Path $installScript)) {
 
 Write-Info 'Running install script as upgrade flow...'
 & $installScript @args
-

@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+$ConfirmPreference = 'None'
 
 $HomeDir = [Environment]::GetFolderPath('UserProfile')
 $InstallRoot = if ($env:COMPANY_OPENCODE_HOME) { $env:COMPANY_OPENCODE_HOME } else { Join-Path $HomeDir '.company-opencode' }
@@ -83,4 +84,3 @@ Ensure-GlobalCompatLinks
 
 Write-Info 'Done.'
 Write-Info "Rolled back using checkpoint: $($backupFile.Name)"
-

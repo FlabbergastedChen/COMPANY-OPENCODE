@@ -3,7 +3,7 @@ setlocal
 
 set "SCRIPT_DIR=%~dp0"
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%SCRIPT_DIR%install-company-opencode.ps1"
+powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%SCRIPT_DIR%install-company-opencode.ps1"
 if errorlevel 1 (
   echo [install][error] PowerShell install failed.
   exit /b 1
@@ -23,4 +23,3 @@ endlocal & (
   set "PATH=%PATH%"
   set "OPENCODE_CONFIG_DIR=%OPENCODE_CONFIG_DIR%"
 )
-

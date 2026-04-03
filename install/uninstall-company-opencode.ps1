@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+$ConfirmPreference = 'None'
 
 $HomeDir = [Environment]::GetFolderPath('UserProfile')
 $InstallRoot = if ($env:COMPANY_OPENCODE_HOME) { $env:COMPANY_OPENCODE_HOME } else { Join-Path $HomeDir '.company-opencode' }
