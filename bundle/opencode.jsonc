@@ -1,5 +1,9 @@
 {
   // Company OpenCode bundle runtime config
+  "plugin": [
+    "./plugins/session-state.ts",
+    "./plugins/http-503-msg-toast.ts"
+  ],
   "instructions": [
     "./instructions/constitution.md",
     "./instructions/coding-standards.md",

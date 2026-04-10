@@ -1,0 +1,23 @@
+2026-04-09T12:53:27.790Z [init] RequestParamsEchoPlugin loaded
+2026-04-09T12:53:27.790Z [config] config hook executed
+2026-04-09T12:53:30.436Z [chat.message] transformed text length=63
+2026-04-09T12:53:30.765Z [messages.transform] seen messages=1
+2026-04-09T12:53:30.765Z [messages.transform] transformed latest user text length=308
+2026-04-10T01:43:15.733Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T01:43:15.734Z [config] config hook executed
+2026-04-10T01:43:21.873Z [chat.message] captured text length=1, session=ses_28af1221effeq0vWEVGVR6tgSG
+2026-04-10T01:43:30.304Z [text.complete] injected into assistant message=msg_d750ede1f001XiBq0TgtncGMeW, session=ses_28af1221effeq0vWEVGVR6tgSG
+2026-04-10T01:43:59.105Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T01:43:59.105Z [config] config hook executed
+2026-04-10T02:23:57.986Z [chat.message] captured text length=4, session=ses_28acbf5f8ffeSbL4WMd7oIJy6r
+2026-04-10T02:24:07.580Z [text.complete] injected into assistant message=msg_d75340a33001a4NRbcMDDIKOsY, session=ses_28acbf5f8ffeSbL4WMd7oIJy6r
+2026-04-10T02:24:36.243Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T02:24:36.243Z [config] config hook executed
+2026-04-10T02:24:42.140Z [text.complete] injected model response for message=msg_d7534ab0e00162RVl4WEeWnxcB
+2026-04-10T03:49:50.892Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T03:49:50.893Z [config] config hook executed
+2026-04-10T03:50:02.048Z [text.complete] injected model response for message=msg_d7582b967001mQBe18IQl2egoa
+2026-04-10T03:55:57.669Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T03:55:57.669Z [config] config hook executed
+2026-04-10T03:56:51.468Z [chat.message] request started session=ses_28a76ea97ffekkZhsuIIF0e506 provider=minimax model=minimax25
+2026-04-10T03:56:54.082Z [text.complete] injected network status session=ses_28a76ea97ffekkZhsuIIF0e506 message=msg_d758915960011rq2FuFI4gdl7Q status=success code=200

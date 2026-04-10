@@ -1,0 +1,5 @@
+2026-04-09T12:37:32.766Z [init] RequestParamsEchoPlugin loaded
+2026-04-09T12:37:32.767Z [config] config hook executed
+2026-04-09T12:37:39.102Z [chat.message] transformed text length=3
+2026-04-09T12:37:39.257Z [messages.transform] seen messages=1
+2026-04-09T12:37:39.257Z [messages.transform] transformed latest user text length=3
