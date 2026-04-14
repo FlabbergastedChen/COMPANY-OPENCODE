@@ -21,3 +21,79 @@
 2026-04-10T03:55:57.669Z [config] config hook executed
 2026-04-10T03:56:51.468Z [chat.message] request started session=ses_28a76ea97ffekkZhsuIIF0e506 provider=minimax model=minimax25
 2026-04-10T03:56:54.082Z [text.complete] injected network status session=ses_28a76ea97ffekkZhsuIIF0e506 message=msg_d758915960011rq2FuFI4gdl7Q status=success code=200
+2026-04-10T05:55:55.304Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T05:55:55.305Z [config] config hook executed
+2026-04-10T05:55:58.191Z [chat.message] request started session=ses_28a09ddb5ffemIxe0jQ8Nj5zPd provider=minimax model=minimax25
+2026-04-10T05:56:10.039Z [text.complete] injected api payload session=ses_28a09ddb5ffemIxe0jQ8Nj5zPd message=msg_d75f62278001xm2PaTBHzFZG4r code=undefined
+2026-04-10T06:03:03.597Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T06:03:03.598Z [config] config hook executed
+2026-04-10T06:03:04.920Z [chat.message] request started session=ses_28a035ac3ffegVaxKHbkwM5MNd provider=minimax model=minimax25
+2026-04-10T06:03:18.750Z [text.complete] injected api payload session=ses_28a035ac3ffegVaxKHbkwM5MNd message=msg_d75fca566001e3qXYBGFBg59Y2 http_status=undefined
+2026-04-10T08:04:09.734Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T08:04:09.734Z [config] config hook executed
+2026-04-10T08:04:12.693Z [chat.message] request started session=ses_289947503ffemskYVqpyBMwbql provider=minimax model=minimax25
+2026-04-10T08:20:59.271Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T08:20:59.271Z [config] config hook executed
+2026-04-10T08:24:44.265Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T08:24:44.265Z [config] config hook executed
+2026-04-10T08:24:46.046Z [chat.message] request started session=ses_28981a33dffeEHvHZc0NdriEpu provider=minimax model=minimax25
+2026-04-10T08:59:31.797Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T08:59:31.797Z [config] config hook executed
+2026-04-10T08:59:36.947Z [chat.message] request started session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=minimax model=minimax25
+2026-04-10T08:59:36.968Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T08:59:37.126Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T08:59:39.138Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T08:59:43.146Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T08:59:51.153Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:00:07.162Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:00:39.172Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:01:43.179Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:03:51.185Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:08:07.194Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:08:37.204Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:09:07.217Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:09:37.226Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:10:07.236Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:10:37.246Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:11:07.253Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:11:37.261Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_28961bba6ffe9j2VKyn5lCb5Kp provider=n/a model=minimax25
+2026-04-10T09:11:37.275Z [event] status captured type=session.error session=ses_28961bba6ffe9j2VKyn5lCb5Kp http_status=400 has_error_message=true
+2026-04-10T09:13:00.474Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T09:13:00.475Z [config] config hook executed
+2026-04-10T09:13:03.363Z [chat.message] request started session=ses_289556d92ffeZOTf2MvJ1SlfRC provider=minimax model=minimax25
+2026-04-10T09:13:03.385Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_289556d92ffeZOTf2MvJ1SlfRC provider=n/a model=minimax25
+2026-04-10T09:13:03.516Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_289556d92ffeZOTf2MvJ1SlfRC provider=n/a model=minimax25
+2026-04-10T09:13:03.522Z [event] status captured type=session.error session=ses_289556d92ffeZOTf2MvJ1SlfRC http_status=400 has_error_message=true
+2026-04-10T09:23:56.759Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T09:23:56.760Z [config] config hook executed
+2026-04-10T09:24:01.693Z [chat.message] request started session=ses_2894b61faffeXL5LjC8BuqgnaB provider=minimax model=minimax25
+2026-04-10T09:24:01.715Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_2894b61faffeXL5LjC8BuqgnaB provider=n/a model=minimax25
+2026-04-10T09:24:01.871Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_2894b61faffeXL5LjC8BuqgnaB provider=n/a model=minimax25
+2026-04-10T09:24:01.877Z [event] status captured type=session.error session=ses_2894b61faffeXL5LjC8BuqgnaB http_status=400 has_error_message=true
+2026-04-10T09:24:22.609Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T09:24:22.610Z [config] config hook executed
+2026-04-10T09:24:24.367Z [chat.message] request started session=ses_2894b0968ffe27E0UbLTxQMr3U provider=minimax model=minimax25
+2026-04-10T09:24:24.389Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_2894b0968ffe27E0UbLTxQMr3U provider=n/a model=minimax25
+2026-04-10T09:24:24.542Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_2894b0968ffe27E0UbLTxQMr3U provider=n/a model=minimax25
+2026-04-10T09:24:24.549Z [event] status captured type=session.error session=ses_2894b0968ffe27E0UbLTxQMr3U http_status=400 has_error_message=true
+2026-04-10T09:26:21.689Z [chat.message] request started session=ses_2894b0968ffe27E0UbLTxQMr3U provider=minimax model=minimax25
+2026-04-10T09:26:21.813Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_2894b0968ffe27E0UbLTxQMr3U provider=n/a model=minimax25
+2026-04-10T09:26:21.821Z [event] status captured type=session.error session=ses_2894b0968ffe27E0UbLTxQMr3U http_status=400 has_error_message=true
+2026-04-10T09:29:19.722Z [chat.message] request started session=ses_2894b0968ffe27E0UbLTxQMr3U provider=minimax model=minimax25
+2026-04-10T09:29:19.870Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_2894b0968ffe27E0UbLTxQMr3U provider=n/a model=minimax25
+2026-04-10T09:29:19.874Z [event] status captured type=session.error session=ses_2894b0968ffe27E0UbLTxQMr3U http_status=400 has_error_message=true
+2026-04-10T09:29:52.160Z [chat.message] request started session=ses_2894b0968ffe27E0UbLTxQMr3U provider=minimax model=minimax25
+2026-04-10T09:29:52.291Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_2894b0968ffe27E0UbLTxQMr3U provider=n/a model=minimax25
+2026-04-10T09:29:52.303Z [event] status captured type=session.error session=ses_2894b0968ffe27E0UbLTxQMr3U http_status=400 has_error_message=true
+2026-04-10T09:31:34.907Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T09:31:34.908Z [config] config hook executed
+2026-04-10T09:31:37.067Z [chat.message] request started session=ses_289446f3cffer37p25W6XWvUpC provider=minimax model=minimax25
+2026-04-10T09:31:37.089Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_289446f3cffer37p25W6XWvUpC provider=n/a model=minimax25
+2026-04-10T09:31:37.259Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_289446f3cffer37p25W6XWvUpC provider=n/a model=minimax25
+2026-04-10T09:31:37.266Z [event] status captured type=session.error session=ses_289446f3cffer37p25W6XWvUpC http_status=400 has_error_message=true
+2026-04-10T09:33:49.575Z [init] RequestParamsEchoPlugin loaded
+2026-04-10T09:33:49.575Z [config] config hook executed
+2026-04-10T09:33:51.577Z [chat.message] request started session=ses_2894261bfffebSBmIGHuj4S327 provider=minimax model=minimax25
+2026-04-10T09:33:51.599Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_2894261bfffebSBmIGHuj4S327 provider=n/a model=minimax25
+2026-04-10T09:33:51.771Z [chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=ses_2894261bfffebSBmIGHuj4S327 provider=n/a model=minimax25
+2026-04-10T09:33:51.779Z [event] status captured type=session.error session=ses_2894261bfffebSBmIGHuj4S327 http_status=400 has_error_message=true

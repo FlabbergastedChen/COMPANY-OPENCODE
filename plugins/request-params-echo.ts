@@ -17,20 +17,6 @@ function writeDebug(line: string): void {
   } catch {}
 }
 
-function extractTextFromParts(parts: any[]): string {
-  if (!Array.isArray(parts)) return '';
-  return parts
-    .filter((p) => p && p.type === 'text' && typeof p.text === 'string')
-    .map((p) => p.text)
-    .join('\n')
-    .trim();
-}
-
-function buildParamLine(text: any): string {
-  const payload = { network_status: text };
-  return `[PLUGIN_ACTIVE][NETWORK_STATUS] ${JSON.stringify(payload)}`;
-}
-
 function parseMaybeJSON(value: unknown): any | null {
   if (typeof value !== 'string' || !value.trim()) return null;
   try {
@@ -40,58 +26,83 @@ function parseMaybeJSON(value: unknown): any | null {
   }
 }
 
+function toHttpStatus(value: unknown): number | null {
+  const n = Number(value);
+  if (Number.isInteger(n) && n >= 100 && n <= 599) return n;
+  return null;
+}
+
 function extractStatusCode(event: any): number | null {
-  const err = (event && event.properties && event.properties.error) || event.error || {};
-  const body =
-    err && err.data && typeof err.data.responseBody === 'string'
+  const err = (event && event.properties && event.properties.error) || event?.error || {};
+  const rootBody =
+    event?.responseBody && typeof event.responseBody === 'string'
+      ? parseMaybeJSON(event.responseBody)
+      : event?.responseBody;
+  const errBody =
+    err?.data?.responseBody && typeof err.data.responseBody === 'string'
       ? parseMaybeJSON(err.data.responseBody)
-      : err && err.data && err.data.responseBody;
+      : err?.data?.responseBody;
+
   const candidates = [
+    event?.properties?.httpStatus,
+    event?.properties?.statusCode,
+    event?.properties?.status,
+    event?.httpStatus,
+    event?.statusCode,
+    event?.status,
     err?.data?.statusCode,
     err?.statusCode,
     err?.status,
-    err?.code,
-    body?.statusCode,
-    body?.status,
-    body?.code,
-    body?.errorcode,
+    rootBody?.statusCode,
+    rootBody?.status,
+    errBody?.statusCode,
+    errBody?.status,
   ];
   for (const c of candidates) {
-    const n = Number(c);
-    if (Number.isFinite(n)) return n;
+    const n = toHttpStatus(c);
+    if (n !== null) return n;
   }
   return null;
 }
 
-function extractErrorMsg(event: any): string {
-  const err = (event && event.properties && event.properties.error) || event.error || {};
-  const body =
-    err && err.data && typeof err.data.responseBody === 'string'
+function extractErrorMessage(event: any): string | undefined {
+  const err = (event && event.properties && event.properties.error) || event?.error || {};
+  const rootBody =
+    event?.responseBody && typeof event.responseBody === 'string'
+      ? parseMaybeJSON(event.responseBody)
+      : event?.responseBody;
+  const errBody =
+    err?.data?.responseBody && typeof err.data.responseBody === 'string'
       ? parseMaybeJSON(err.data.responseBody)
-      : err && err.data && err.data.responseBody;
-  return (
-    body?.msg ||
-    body?.message ||
-    body?.error?.msg ||
-    body?.error?.message ||
-    err?.data?.message ||
-    err?.message ||
-    'request_failed'
-  );
+      : err?.data?.responseBody;
+
+  const candidates = [
+    event?.properties?.error?.message,
+    event?.error?.message,
+    err?.message,
+    err?.data?.message,
+    errBody?.error?.message,
+    errBody?.message,
+    rootBody?.error?.message,
+    rootBody?.message,
+  ];
+
+  for (const c of candidates) {
+    if (typeof c === 'string' && c.trim()) return c.trim();
+  }
+  return undefined;
 }
 
-type SessionRequestState = {
-  startedAt: number;
-  providerID?: string;
-  modelID?: string;
+type CapturedStatus = {
+  httpStatus: number;
+  errorMessage?: string;
 };
 
 export const RequestParamsEchoPlugin: Plugin = async ({ client }) => {
   writeDebug('[init] RequestParamsEchoPlugin loaded');
 
-  const injectedMessageIDs = new Set();
-  const requestBySession = new Map<string, SessionRequestState>();
-  const lastStatusBySession = new Map<string, any>();
+  const injectedMessageIDs = new Set<string>();
+  const lastStatusBySession = new Map<string, CapturedStatus>();
 
   return {
     config: async () => {
@@ -99,45 +110,40 @@ export const RequestParamsEchoPlugin: Plugin = async ({ client }) => {
     },
 
     event: async ({ event }: { event: any }) => {
-      if (!event || event.type !== 'session.error') return;
+      if (!event) return;
       const code = extractStatusCode(event);
-      const message = extractErrorMsg(event);
-      const sessionID = event?.properties?.sessionID || '';
-      const req = sessionID ? requestBySession.get(sessionID) : undefined;
-      const latencyMs = req ? Date.now() - req.startedAt : undefined;
+      if (code === null) return;
+      const errorMessage = extractErrorMessage(event);
 
-      const status = {
-        status: 'error',
-        code: code ?? 'unknown',
-        message,
-        latency_ms: latencyMs,
-        provider_id: req?.providerID,
-        model_id: req?.modelID,
-      };
-
+      const sessionID = event?.properties?.sessionID || event?.sessionID || '';
       if (sessionID) {
-        lastStatusBySession.set(sessionID, status);
-        requestBySession.delete(sessionID);
+        lastStatusBySession.set(sessionID, { httpStatus: code, errorMessage });
       }
       writeDebug(
-        `[event] session.error captured session=${sessionID || 'n/a'} code=${String(status.code)} msg=${message}`
+        `[event] status captured type=${event?.type || 'n/a'} session=${sessionID || 'n/a'} http_status=${String(code)} has_error_message=${String(Boolean(errorMessage))}`
       );
     },
 
     'chat.message': async (input: any) => {
       const sessionID = input?.sessionID || '';
       if (!sessionID) return;
-      requestBySession.set(sessionID, {
-        startedAt: Date.now(),
-        providerID: input?.model?.providerID,
-        modelID: input?.model?.modelID,
-      });
       writeDebug(
         `[chat.message] request started session=${sessionID} provider=${input?.model?.providerID || 'n/a'} model=${input?.model?.modelID || 'n/a'}`
       );
     },
 
-    // Prepend real network status for this request to assistant text.
+    // Force-disable SDK retries before sending the model request.
+    'chat.params': async (input: any, output: any) => {
+      output.options = output.options || {};
+      output.options.maxRetries = 0;
+      output.options.maxRetry = 0;
+      output.options.retries = 0;
+      writeDebug(
+        `[chat.params] forced maxRetries=0/maxRetry=0/retries=0 session=${input?.sessionID || 'n/a'} provider=${input?.provider?.info?.id || 'n/a'} model=${input?.model?.id || input?.model?.name || 'n/a'}`
+      );
+    },
+
+    // Only override output for real HTTP 400 with server error.message.
     'experimental.text.complete': async (input: any, output: any) => {
       const sessionID = input && input.sessionID ? input.sessionID : '';
       const messageID = input && input.messageID ? input.messageID : '';
@@ -146,29 +152,23 @@ export const RequestParamsEchoPlugin: Plugin = async ({ client }) => {
 
       const currentText = typeof output.text === 'string' ? output.text : '';
       if (!currentText.trim()) return;
-      if (currentText.includes('[PLUGIN_ACTIVE][NETWORK_STATUS]')) return;
 
-      const req = requestBySession.get(sessionID);
-      const fallback = lastStatusBySession.get(sessionID);
-      const realStatus =
-        fallback ||
-        {
-          status: 'success',
-          code: 200,
-          message: 'ok',
-          latency_ms: req ? Date.now() - req.startedAt : undefined,
-          provider_id: req?.providerID,
-          model_id: req?.modelID,
-        };
+      const captured = lastStatusBySession.get(sessionID);
+      if (captured === undefined) return;
 
-      const paramLine = buildParamLine(realStatus);
-      output.text = `${paramLine}\n${currentText}`.trim();
+      const has400ErrorMessage =
+        captured.httpStatus === 400 &&
+        typeof captured.errorMessage === 'string' &&
+        captured.errorMessage.trim().length > 0;
+
+      if (has400ErrorMessage) {
+        output.text = captured.errorMessage;
+      }
       injectedMessageIDs.add(messageID);
-      requestBySession.delete(sessionID);
       lastStatusBySession.delete(sessionID);
 
       writeDebug(
-        `[text.complete] injected network status session=${sessionID} message=${messageID} status=${realStatus.status} code=${String(realStatus.code)}`
+        `[text.complete] injected session=${sessionID} message=${messageID} http_status=${String(captured.httpStatus)} replace_with_400_message=${String(has400ErrorMessage)}`
       );
       try {
         await client.app.log({
@@ -176,7 +176,12 @@ export const RequestParamsEchoPlugin: Plugin = async ({ client }) => {
             service: 'request-params-echo-plugin',
             level: 'info',
             message: 'experimental.text.complete injected',
-            extra: { sessionID, messageID, status: realStatus },
+            extra: {
+              sessionID,
+              messageID,
+              http_status: captured.httpStatus,
+              replace_with_400_message: has400ErrorMessage,
+            },
           },
         });
       } catch {}

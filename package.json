@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "mock:503": "node test/mock-503-server.js"
+  },
   "dependencies": {
     "@opencode-ai/plugin": "1.4.1"
   }
